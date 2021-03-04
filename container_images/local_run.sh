@@ -43,6 +43,9 @@ pid="$!"
 pids="$pids $pid"
 echo "run ingress $pid"
 
+# collect data
+echo RUN. tcpdump -i lo "port ${ingress_port} or ${wordcount_port} or ${reverse_port}" -x > record
+
 sleep 1
 
 i=0

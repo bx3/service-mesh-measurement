@@ -71,6 +71,7 @@ fn main() {
                 map.insert("text", text.to_string());
                 map.insert("mid", mid.to_string());
                 // wordcount. Blocking, can be made threaded, but suppose they forms a chain
+                println!("run wordcount");
                 let wordcount_result = match query_service(&map, wordcount_socket, "wordcount") {
                     Ok(result) => result,
                     Err(e) => {
@@ -78,6 +79,7 @@ fn main() {
                         "wordcount error".to_string()
                     }
                 };
+                println!("run reverse");
                 let reverse_result = match query_service(&map, reverse_socket, "reverse") {
                     Ok(r) => r,
                     Err(e) => {

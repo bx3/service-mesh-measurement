@@ -3,4 +3,7 @@ WORKDIR /home/app
 COPY ./wordcount .
 EXPOSE 40000/tcp
 RUN cargo install --path .
-ENTRYPOINT ["wordcount", "127.0.0.1:40000"]
+RUN apt-get update && apt-get install -y tcpdump 
+COPY start.sh /home/app
+RUN ["chmod", "+x", "/home/app/start.sh"]
+ENTRYPOINT /home/app/start.sh
