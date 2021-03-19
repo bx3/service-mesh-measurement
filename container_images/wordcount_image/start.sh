@@ -1,3 +1,3 @@
 #!/bin/bash
 wordcount 0.0.0.0:80 &
-tcpdump "port 80" -x 
+tcpdump -s 0 -A "port 80"

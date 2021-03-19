@@ -1,5 +1,5 @@
 #!/bin/bash
-
+#eval $(minikube -p minikube docker-env)
 # running order matters. ip is located with environment variable
 # run wordcount service
 kubectl apply -f wordcount-svc.yaml

@@ -1,0 +1,93 @@
+tcpdump: verbose output suppressed, use -v or -vv for full protocol decode
+listening on eth0, link-type EN10MB (Ethernet), capture size 262144 bytes
+run wordcount
+run reverse
+20:03:11.113352 IP ingress-deploy-59ff4c4c56-4rl87.56120 > 169.254.169.254.http: Flags [S], seq 4156040232, win 64240, options [mss 1460,sackOK,TS val 205866087 ecr 0,nop,wscale 7], length 0
+E..<..@.@............8.P..$(.........E.........
+.EDg........
+20:03:12.116314 IP ingress-deploy-59ff4c4c56-4rl87.56120 > 169.254.169.254.http: Flags [S], seq 4156040232, win 64240, options [mss 1460,sackOK,TS val 205867090 ecr 0,nop,wscale 7], length 0
+E..<..@.@............8.P..$(.........E.........
+.EHR........
+20:03:54.087746 IP ingress-deploy-59ff4c4c56-4rl87.33342 > 172-17-0-6.wordcount-svc.default.svc.cluster.local.http: Flags [S], seq 99443201, win 64240, options [mss 1460,sackOK,TS val 418457252 ecr 0,nop,wscale 7], length 0
+E..<.>@.@.7M.........>.P..b.........X_.........
+..&.........
+20:03:54.087816 IP 172-17-0-6.wordcount-svc.default.svc.cluster.local.http > ingress-deploy-59ff4c4c56-4rl87.33342: Flags [S.], seq 3576340803, ack 99443202, win 65160, options [mss 1460,sackOK,TS val 1932168307 ecr 418457252,nop,wscale 7], length 0
+E..<..@.@............P.>.*.C..b.....X_.........
+s*.s..&.....
+20:03:54.087836 IP ingress-deploy-59ff4c4c56-4rl87.33342 > 172-17-0-6.wordcount-svc.default.svc.cluster.local.http: Flags [.], ack 1, win 502, options [nop,nop,TS val 418457253 ecr 1932168307], length 0
+E..4.?@.@.7T.........>.P..b..*.D....XW.....
+..&.s*.s
+20:03:54.088069 IP ingress-deploy-59ff4c4c56-4rl87.33342 > 172-17-0-6.wordcount-svc.default.svc.cluster.local.http: Flags [P.], seq 1:1300, ack 1, win 502, options [nop,nop,TS val 418457253 ecr 1932168307], length 1299: HTTP: POST /wordcount HTTP/1.1
+E..G.@@.@.2@.........>.P..b..*.D....]j.....
+..&.s*.sPOST /wordcount HTTP/1.1
+host: 10.99.110.100
+content-type: application/json
+content-length: 30
+accept: */*
+x-forwarded-proto: http
+x-request-id: 8adb87ee-59aa-90c4-99bd-fbfd10d9de45
+x-envoy-decorator-operation: wordcount-svc.default.svc.cluster.local:80/*
+x-envoy-peer-metadata: Ch8KDkFQUF9DT05UQUlORVJTEg0aC2luZ3Jlc3MtYXBwChoKCkNMVVNURVJfSUQSDBoKS3ViZXJuZXRlcwoYCg1JU1RJT19WRVJTSU9OEgcaBTEuOS4xCuMBCgZMQUJFTFMS2AEq1QEKEAoDYXBwEgkaB2luZ3Jlc3MKGQoMaXN0aW8uaW8vcmV2EgkaB2RlZmF1bHQKIQoRcG9kLXRlbXBsYXRlLWhhc2gSDBoKNTlmZjRjNGM1NgokChlzZWN1cml0eS5pc3Rpby5pby90bHNNb2RlEgcaBWlzdGlvCiwKH3NlcnZpY2UuaXN0aW8uaW8vY2Fub25pY2FsLW5hbWUSCRoHaW5ncmVzcwovCiNzZXJ2aWNlLmlzdGlvLmlvL2Nhbm9uaWNhbC1yZXZpc2lvbhIIGgZsYXRlc3QKGgoHTUVTSF9JRBIPGg1jbHVzdGVyLmxvY2FsCikKBE5BTUUSIRofaW5ncmVzcy1kZXBsb3ktNTlmZjRjNGM1Ni00cmw4NwoWCglOQU1FU1BBQ0USCRoHZGVmYXVsdApSCgVPV05FUhJJGkdrdWJlcm5ldGVzOi8vYXBpcy9hcHBzL3YxL25hbWVzcGFjZXMvZGVmYXVsdC9kZXBsb3ltZW50cy9pbmdyZXNzLWRlcGxveQoXChFQTEFURk9STV9NRVRBREFUQRICKgAKIQoNV09SS0xPQURfTkFNRRIQGg5pbmdyZXNzLWRlcGxveQ==
+x-envoy-peer-metadata-id: sidecar~172.17.0.8~ingress-deploy-59ff4c4c56-4rl87.default~default.svc.cluster.local
+x-envoy-attempt-count: 1
+x-b3-traceid: 9a6899fbfb9a563b91a787a890a4e0ec
+x-b3-spanid: 91a787a890a4e0ec
+x-b3-sampled: 1
+
+{"text":"test test","mid":"1"}
+20:03:54.088114 IP 172-17-0-6.wordcount-svc.default.svc.cluster.local.http > ingress-deploy-59ff4c4c56-4rl87.33342: Flags [.], ack 1300, win 501, options [nop,nop,TS val 1932168308 ecr 418457253], length 0
+E..4..@.@.E..........P.>.*.D..g.....XW.....
+s*.t..&.
+20:03:54.116180 IP 172-17-0-6.wordcount-svc.default.svc.cluster.local.http > ingress-deploy-59ff4c4c56-4rl87.33342: Flags [P.], seq 1:1075, ack 1300, win 501, options [nop,nop,TS val 1932168336 ecr 418457253], length 1074: HTTP: HTTP/1.1 200 OK
+E..f..@.@.@..........P.>.*.D..g.....\......
+s*....&.HTTP/1.1 200 OK
+server: istio-envoy
+date: Wed, 17 Mar 2021 20:03:54 GMT
+content-type: text/plain; charset=UTF-8
+content-length: 4
+x-envoy-upstream-service-time: 0
+x-envoy-peer-metadata: CiEKDkFQUF9DT05UQUlORVJTEg8aDXdvcmRjb3VudC1hcHAKGgoKQ0xVU1RFUl9JRBIMGgpLdWJlcm5ldGVzChgKDUlTVElPX1ZFUlNJT04SBxoFMS45LjEK5wEKBkxBQkVMUxLcASrZAQoSCgNhcHASCxoJd29yZGNvdW50ChkKDGlzdGlvLmlvL3JldhIJGgdkZWZhdWx0CiEKEXBvZC10ZW1wbGF0ZS1oYXNoEgwaCjY4N2ZjNzljZjQKJAoZc2VjdXJpdHkuaXN0aW8uaW8vdGxzTW9kZRIHGgVpc3RpbwouCh9zZXJ2aWNlLmlzdGlvLmlvL2Nhbm9uaWNhbC1uYW1lEgsaCXdvcmRjb3VudAovCiNzZXJ2aWNlLmlzdGlvLmlvL2Nhbm9uaWNhbC1yZXZpc2lvbhIIGgZsYXRlc3QKGgoHTUVTSF9JRBIPGg1jbHVzdGVyLmxvY2FsCisKBE5BTUUSIxohd29yZGNvdW50LWRlcGxveS02ODdmYzc5Y2Y0LWNuc2o5ChYKCU5BTUVTUEFDRRIJGgdkZWZhdWx0ClQKBU9XTkVSEksaSWt1YmVybmV0ZXM6Ly9hcGlzL2FwcHMvdjEvbmFtZXNwYWNlcy9kZWZhdWx0L2RlcGxveW1lbnRzL3dvcmRjb3VudC1kZXBsb3kKFwoRUExBVEZPUk1fTUVUQURBVEESAioACiMKDVdPUktMT0FEX05BTUUSEhoQd29yZGNvdW50LWRlcGxveQ==
+x-envoy-peer-metadata-id: sidecar~172.17.0.6~wordcount-deploy-687fc79cf4-cnsj9.default~default.svc.cluster.local
+
+1: 9
+20:03:54.116189 IP ingress-deploy-59ff4c4c56-4rl87.33342 > 172-17-0-6.wordcount-svc.default.svc.cluster.local.http: Flags [.], ack 1075, win 501, options [nop,nop,TS val 418457281 ecr 1932168336], length 0
+E..4.A@.@.7R.........>.P..g..*.v....XW.....
+..&.s*..
+20:03:54.161627 IP ingress-deploy-59ff4c4c56-4rl87.44510 > 172-17-0-7.reverse-svc.default.svc.cluster.local.http: Flags [S], seq 3304914318, win 64240, options [mss 1460,sackOK,TS val 2354414002 ecr 0,nop,wscale 7], length 0
+E..<O.@.@..............P............X`.........
+.U..........
+20:03:54.161683 IP 172-17-0-7.reverse-svc.default.svc.cluster.local.http > ingress-deploy-59ff4c4c56-4rl87.44510: Flags [S.], seq 1356108813, ack 3304914319, win 65160, options [mss 1460,sackOK,TS val 1304138196 ecr 2354414002,nop,wscale 7], length 0
+E..<..@.@............P..P...........X`.........
+M....U......
+20:03:54.161701 IP ingress-deploy-59ff4c4c56-4rl87.44510 > 172-17-0-7.reverse-svc.default.svc.cluster.local.http: Flags [.], ack 1, win 502, options [nop,nop,TS val 2354414002 ecr 1304138196], length 0
+E..4O.@.@..............P....P.......XX.....
+.U..M...
+20:03:54.161872 IP ingress-deploy-59ff4c4c56-4rl87.44510 > 172-17-0-7.reverse-svc.default.svc.cluster.local.http: Flags [P.], seq 1:1295, ack 1, win 502, options [nop,nop,TS val 2354414003 ecr 1304138196], length 1294: HTTP: POST /reverse HTTP/1.1
+E..BO.@.@..............P....P.......]f.....
+.U..M...POST /reverse HTTP/1.1
+host: 10.99.148.87
+content-type: application/json
+content-length: 30
+accept: */*
+x-forwarded-proto: http
+x-request-id: a0af8cfe-ef29-934c-b69b-a2eabb837c89
+x-envoy-decorator-operation: reverse-svc.default.svc.cluster.local:80/*
+x-envoy-peer-metadata: Ch8KDkFQUF9DT05UQUlORVJTEg0aC2luZ3Jlc3MtYXBwChoKCkNMVVNURVJfSUQSDBoKS3ViZXJuZXRlcwoYCg1JU1RJT19WRVJTSU9OEgcaBTEuOS4xCuMBCgZMQUJFTFMS2AEq1QEKEAoDYXBwEgkaB2luZ3Jlc3MKGQoMaXN0aW8uaW8vcmV2EgkaB2RlZmF1bHQKIQoRcG9kLXRlbXBsYXRlLWhhc2gSDBoKNTlmZjRjNGM1NgokChlzZWN1cml0eS5pc3Rpby5pby90bHNNb2RlEgcaBWlzdGlvCiwKH3NlcnZpY2UuaXN0aW8uaW8vY2Fub25pY2FsLW5hbWUSCRoHaW5ncmVzcwovCiNzZXJ2aWNlLmlzdGlvLmlvL2Nhbm9uaWNhbC1yZXZpc2lvbhIIGgZsYXRlc3QKGgoHTUVTSF9JRBIPGg1jbHVzdGVyLmxvY2FsCikKBE5BTUUSIRofaW5ncmVzcy1kZXBsb3ktNTlmZjRjNGM1Ni00cmw4NwoWCglOQU1FU1BBQ0USCRoHZGVmYXVsdApSCgVPV05FUhJJGkdrdWJlcm5ldGVzOi8vYXBpcy9hcHBzL3YxL25hbWVzcGFjZXMvZGVmYXVsdC9kZXBsb3ltZW50cy9pbmdyZXNzLWRlcGxveQoXChFQTEFURk9STV9NRVRBREFUQRICKgAKIQoNV09SS0xPQURfTkFNRRIQGg5pbmdyZXNzLWRlcGxveQ==
+x-envoy-peer-metadata-id: sidecar~172.17.0.8~ingress-deploy-59ff4c4c56-4rl87.default~default.svc.cluster.local
+x-envoy-attempt-count: 1
+x-b3-traceid: 82ff7bf0ea2350e25311d5ec664d6725
+x-b3-spanid: 5311d5ec664d6725
+x-b3-sampled: 1
+
+{"text":"test test","mid":"1"}
+20:03:54.161906 IP 172-17-0-7.reverse-svc.default.svc.cluster.local.http > ingress-deploy-59ff4c4c56-4rl87.44510: Flags [.], ack 1295, win 501, options [nop,nop,TS val 1304138197 ecr 2354414003], length 0
+E..4).@.@............P..P...........XX.....
+M....U..
+20:03:54.189207 IP 172-17-0-7.reverse-svc.default.svc.cluster.local.http > ingress-deploy-59ff4c4c56-4rl87.44510: Flags [P.], seq 1:1066, ack 1295, win 501, options [nop,nop,TS val 1304138224 ecr 2354414003], length 1065: HTTP: HTTP/1.1 200 OK
+E..]).@.@............P..P...........\......
+M....U..HTTP/1.1 200 OK
+server: istio-envoy
+date: Wed, 17 Mar 2021 20:03:54 GMT
+content-type: text/plain; charset=UTF-8
+content-length: 12
+x-envoy-upstream-service-time: 0

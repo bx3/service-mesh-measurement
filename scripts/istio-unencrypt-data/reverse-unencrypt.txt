@@ -1,0 +1,47 @@
+tcpdump: verbose output suppressed, use -v or -vv for full protocol decode
+listening on eth0, link-type EN10MB (Ethernet), capture size 262144 bytes
+20:03:07.964499 IP reverse-deploy-7c7c45894f-z7dww.59044 > 169.254.169.254.http: Flags [S], seq 3438816760, win 64240, options [mss 1460,sackOK,TS val 268636426 ecr 0,nop,wscale 7], length 0
+E..<[.@.@..............P..-..........D.........
+...
+........
+20:03:08.980273 IP reverse-deploy-7c7c45894f-z7dww.59044 > 169.254.169.254.http: Flags [S], seq 3438816760, win 64240, options [mss 1460,sackOK,TS val 268637442 ecr 0,nop,wscale 7], length 0
+E..<[.@.@..............P..-..........D.........
+............
+20:03:54.161650 IP 172-17-0-8.ingress-svc.default.svc.cluster.local.44510 > reverse-deploy-7c7c45894f-z7dww.http: Flags [S], seq 3304914318, win 64240, options [mss 1460,sackOK,TS val 2354414002 ecr 0,nop,wscale 7], length 0
+E..<O.@.@..............P............X`.........
+.U..........
+20:03:54.161676 IP reverse-deploy-7c7c45894f-z7dww.http > 172-17-0-8.ingress-svc.default.svc.cluster.local.44510: Flags [S.], seq 1356108813, ack 3304914319, win 65160, options [mss 1460,sackOK,TS val 1304138196 ecr 2354414002,nop,wscale 7], length 0
+E..<..@.@............P..P...........X`.........
+M....U......
+20:03:54.161707 IP 172-17-0-8.ingress-svc.default.svc.cluster.local.44510 > reverse-deploy-7c7c45894f-z7dww.http: Flags [.], ack 1, win 502, options [nop,nop,TS val 2354414002 ecr 1304138196], length 0
+E..4O.@.@..............P....P.......XX.....
+.U..M...
+20:03:54.161884 IP 172-17-0-8.ingress-svc.default.svc.cluster.local.44510 > reverse-deploy-7c7c45894f-z7dww.http: Flags [P.], seq 1:1295, ack 1, win 502, options [nop,nop,TS val 2354414003 ecr 1304138196], length 1294: HTTP: POST /reverse HTTP/1.1
+E..BO.@.@..............P....P.......]f.....
+.U..M...POST /reverse HTTP/1.1
+host: 10.99.148.87
+content-type: application/json
+content-length: 30
+accept: */*
+x-forwarded-proto: http
+x-request-id: a0af8cfe-ef29-934c-b69b-a2eabb837c89
+x-envoy-decorator-operation: reverse-svc.default.svc.cluster.local:80/*
+x-envoy-peer-metadata: Ch8KDkFQUF9DT05UQUlORVJTEg0aC2luZ3Jlc3MtYXBwChoKCkNMVVNURVJfSUQSDBoKS3ViZXJuZXRlcwoYCg1JU1RJT19WRVJTSU9OEgcaBTEuOS4xCuMBCgZMQUJFTFMS2AEq1QEKEAoDYXBwEgkaB2luZ3Jlc3MKGQoMaXN0aW8uaW8vcmV2EgkaB2RlZmF1bHQKIQoRcG9kLXRlbXBsYXRlLWhhc2gSDBoKNTlmZjRjNGM1NgokChlzZWN1cml0eS5pc3Rpby5pby90bHNNb2RlEgcaBWlzdGlvCiwKH3NlcnZpY2UuaXN0aW8uaW8vY2Fub25pY2FsLW5hbWUSCRoHaW5ncmVzcwovCiNzZXJ2aWNlLmlzdGlvLmlvL2Nhbm9uaWNhbC1yZXZpc2lvbhIIGgZsYXRlc3QKGgoHTUVTSF9JRBIPGg1jbHVzdGVyLmxvY2FsCikKBE5BTUUSIRofaW5ncmVzcy1kZXBsb3ktNTlmZjRjNGM1Ni00cmw4NwoWCglOQU1FU1BBQ0USCRoHZGVmYXVsdApSCgVPV05FUhJJGkdrdWJlcm5ldGVzOi8vYXBpcy9hcHBzL3YxL25hbWVzcGFjZXMvZGVmYXVsdC9kZXBsb3ltZW50cy9pbmdyZXNzLWRlcGxveQoXChFQTEFURk9STV9NRVRBREFUQRICKgAKIQoNV09SS0xPQURfTkFNRRIQGg5pbmdyZXNzLWRlcGxveQ==
+x-envoy-peer-metadata-id: sidecar~172.17.0.8~ingress-deploy-59ff4c4c56-4rl87.default~default.svc.cluster.local
+x-envoy-attempt-count: 1
+x-b3-traceid: 82ff7bf0ea2350e25311d5ec664d6725
+x-b3-spanid: 5311d5ec664d6725
+x-b3-sampled: 1
+
+{"text":"test test","mid":"1"}
+20:03:54.161901 IP reverse-deploy-7c7c45894f-z7dww.http > 172-17-0-8.ingress-svc.default.svc.cluster.local.44510: Flags [.], ack 1295, win 501, options [nop,nop,TS val 1304138197 ecr 2354414003], length 0
+E..4).@.@............P..P...........XX.....
+M....U..
+20:03:54.189188 IP reverse-deploy-7c7c45894f-z7dww.http > 172-17-0-8.ingress-svc.default.svc.cluster.local.44510: Flags [P.], seq 1:1066, ack 1295, win 501, options [nop,nop,TS val 1304138224 ecr 2354414003], length 1065: HTTP: HTTP/1.1 200 OK
+E..]).@.@............P..P...........\......
+M....U..HTTP/1.1 200 OK
+server: istio-envoy
+date: Wed, 17 Mar 2021 20:03:54 GMT
+content-type: text/plain; charset=UTF-8
+content-length: 12
+x-envoy-upstream-service-time: 0

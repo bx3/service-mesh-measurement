@@ -1,3 +1,3 @@
 #!/bin/bash
 ingress 0.0.0.0:80 ${WORDCOUNT_SVC_SERVICE_HOST}:${WORDCOUNT_SVC_SERVICE_PORT} ${REVERSE_SVC_SERVICE_HOST}:${REVERSE_SVC_SERVICE_PORT} &
-tcpdump "port 80" -x 
+tcpdump -s 0 -A "port 80" 
