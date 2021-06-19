@@ -1,0 +1,13 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: single-node
+  region: us-west-2
+
+nodeGroups:
+  - name: ng-single
+    instanceType: c5.xlarge  # 4vCPU 8GiB-Mem 10Gbps-Net
+    desiredCapacity: 1
+    ssh:
+      allow: true

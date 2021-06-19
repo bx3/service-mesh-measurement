@@ -1,0 +1,4 @@
+*
+!ingress/Cargo.toml
+!ingress/src
+!start.sh

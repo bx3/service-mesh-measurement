@@ -1,0 +1,4 @@
+*
+!service/Cargo.toml
+!service/src
+!start.sh

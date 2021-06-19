@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wordcount-deploy
+spec:
+  selector:
+    matchLabels:
+      app: wordcount 
+  replicas: 1 
+  template:
+    metadata:
+      labels:
+        app: wordcount
+    spec:
+      containers:
+      - name: wordcount-app
+        image: bx33/service-hyper:latest
+        imagePullPolicy: IfNotPresent 
+        #ports:
+        #- containerPort: 40000 

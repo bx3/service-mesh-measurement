@@ -1,1 +1,9 @@
-This is a serice mesh measurement project for UW CSE 561.
+This project is originally developed as a service mesh measurement.
+
+The container images are stored under image.
+
+git clone https://github.com/brendangregg/FlameGraph.git ./testbed/script/FlameGraph
+
+To run the code, 
+
+cd testbed && ./run.sh help

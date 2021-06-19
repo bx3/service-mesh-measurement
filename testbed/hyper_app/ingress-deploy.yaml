@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ingress-deploy
+spec:
+  selector:
+    matchLabels:
+      app: ingress  # just need to match against template.metadata.labels
+  replicas: 1 
+  template:
+    metadata:
+      labels:
+        app: ingress 
+    spec:
+      containers:
+      - name: ingress-hyper
+        image: bx33/ingress-hyper:latest
+        imagePullPolicy: IfNotPresent 
+        #ports:
+        #- containerPort: 80 
+          # more info -> https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.20/#deployment-v1-apps
