@@ -27,7 +27,9 @@ length=$7
 goCommand=$8
 pids=""
 for i in $(seq 1 $num_gen); do
-    ./data-gen/data-gen $goCommand -sock=$sock -interval=${interval} -num=${num_msg} -var=$variance -verbose=$verbose -length=$length &
+    mkdir -p "/home/ubuntu/gen"
+    outpath="/home/ubuntu/gen/gen$i"
+    ./data-gen/data-gen $goCommand -sock=$sock -interval=${interval} -num=${num_msg} -var=$variance -verbose=$verbose -length=$length -outpath=$outpath &
     pid="$!"
     pids="$pids $pid"
 done

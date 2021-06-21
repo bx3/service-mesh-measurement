@@ -29,9 +29,11 @@ function gen_data {
     local length=$7
     local goSubcommand=$8
     local pids=""
+    mkdir -p "./output/local"
     for i in $(seq 1 $num_gen); do
-        ./data-gen/data-gen $goSubcommand -sock=$sock -interval=${interval} -num=${num_msg} -var=$variance -verbose=$verbose -length=$length &
-        #echo "./data-gen/data-gen $goSubcommand -sock=$sock -interval=${interval} -num=${num_msg} -var=$variance -verbose=$verbose -length=$length "
+        outpath="output/local/gen$i"
+        ./data-gen/data-gen $goSubcommand -sock=$sock -interval=${interval} -num=${num_msg} -var=$variance -verbose=$verbose -length=$length -outpath=$outpath &
+        #echo "./data-gen/data-gen $goSubcommand -sock=$sock -interval=${interval} -num=${num_msg} -var=$variance -verbose=$verbose -length=$length -outpath='$outpath'"
         pid="$!"
         pids="$pids $pid"
     done
@@ -44,7 +46,7 @@ function remote_gen_data {
     if [ "$#" -ne 7 ]; then
         tput setaf 3 
         echo "Usage.                        num_gen<int> interval<int> num_msg<int> var<int> verbose<bool> length<int>"
-        echo "Example. ./run.sh r-gen-data        4          500          5            50       true          10"
+        echo "Example. ./run.sh r-gen-data        4          500          5            50       true          10      "
         echo "time in milliseconds; sock ip:port"
         tput sgr0
         exit 1
@@ -56,7 +58,7 @@ function remote_gen_data {
         local instanceId 
         local ip
         IFS=',' read -r instanceId ip  <<< "$node"
-        gen_instances="$gen_instances $instanceId"
+        gen_instances="$instanceId"
         gen_ips="$gen_ips $ip"
     done
 
@@ -67,10 +69,21 @@ function remote_gen_data {
         local instanceId 
         local ip
         IFS=',' read -r instanceId ip  <<< "$node"
-        eks_instances="$eks_instances $instanceId"
+        eks_instances="$instanceId"
         eks_ips="$eks_ips $ip"
     done
+    
+    ssh ${gen_instances} -- "rm -r /home/ubuntu/gen"
+    ssh ${gen_instances} -- "mkdir -p /home/ubuntu/gen"
     ssh ${gen_instances} -- "/home/ubuntu/data-gen.sh ${eks_ips}:30009 $@"
+
+    echo "Finish. All generators."
+    experiment_name=$(cat experiment.txt)
+    local_gen_out="./output/${experiment_name}/${gen_instances}"
+    echo ${local_gen_out}
+    rm -rf ${local_gen_out}
+    mkdir -p ${local_gen_out}
+    scp -r ${gen_instances}:/home/ubuntu/gen ${local_gen_out}
 }
 
 function remote_clean_proc {
@@ -124,6 +137,24 @@ function add_gen_instance {
     scp -r ./data-gen $instanceId:/home/ubuntu
     scp script/data-gen.sh $instanceId:/home/ubuntu
     ssh $instanceId -- "chmod +x data-gen.sh"
+    tput setaf 2 
+    echo "data-gen transferred"
+    tput sgr0
+}
+
+function setup_gen_pkg {
+    nodes=$(cat gen-instance.txt)
+    instances=""
+    for node in $nodes; do
+        local instanceId 
+        local ip
+        IFS=',' read -r instanceId ip  <<< "$node"
+        instances="$instances $instanceId"
+    done
+
+    scp -r ./data-gen $instances:/home/ubuntu
+    scp script/data-gen.sh $instances:/home/ubuntu
+    ssh $instances -- "chmod +x data-gen.sh"
     tput setaf 2 
     echo "data-gen transferred"
     tput sgr0
@@ -332,7 +363,7 @@ function start_eks {
 }
 
 function stop_eks {
-    echo "Run -> kubectl delete svc <service-name> from below"
+    echo "Run -> eksctl get cluster"
     echo "Then Run -> eksctl delete cluster --name <cluster-name>"
     kubectl get svc --all-namespaces
 }
@@ -356,13 +387,15 @@ function ssh_perf {
     period=$2
     name=$3
 
+    echo "$name" > experiment.txt
+
     nodes=$(cat eks-instance.txt)
     instances=""
     for node in $nodes; do
         local instanceId 
         local ip
         IFS=',' read -r instanceId ip  <<< "$node"
-        instances="$instances $instanceId"
+        instances="$instanceId"
     done
     
     ssh $instances -- "rm -f perf.data"
@@ -371,6 +404,8 @@ function ssh_perf {
     command_str="sudo perf record -F $1 -a -g -o /home/ec2-user/perf.data -- sleep $2 "
     echo ${command_str} | ssh $instances &> /dev/null
     echo "sudo perf script --header -i perf.data > out.stacks" | ssh $instances &> /dev/null
+    echo "scp $instances:/home/ec2-user/out.stacks ./output/${name}.stacks"
+    mkdir -p ./output/${name}
     scp $instances:/home/ec2-user/out.stacks ./output/${name}.stacks
     ./script/FlameGraph/stackcollapse-perf.pl < ./output/${name}.stacks | ./script/FlameGraph/flamegraph.pl --hash > output/${name}.svg
 
@@ -428,8 +463,9 @@ function setup_eks_node {
 }
 
 function config_ssh_agent {
-    eval `ssh-agent -s`
-    ssh-add ~/.ssh/id_rsa
+    echo "RUN following"
+    echo "eval \`ssh-agent -s\`"
+    echo "ssh-add ~/.ssh/id_rsa"
 }
 
 case "$1" in
@@ -468,6 +504,7 @@ case "$1" in
       r-clean-proc             Clean payload generating process on AWS
 
       add-gen-instance         Create AWS instance for sending request
+      setup-gen-pkg            Setup AWS generator necessary binary
       rm-gen-instance          Remove AWS generator instance
 
     Build images
@@ -499,6 +536,8 @@ EOF
     remote_clean_proc ;;
   add-gen-instance)
     add_gen_instance ;;
+  setup-gen-pkg)
+    setup_gen_pkg ;;
   rm-gen-instance)
     rm_gen_instance ;;
   start-minikube-trace)
