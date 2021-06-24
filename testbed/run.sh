@@ -45,12 +45,15 @@ function gen_data {
 function remote_gen_data {
     if [ "$#" -ne 7 ]; then
         tput setaf 3 
+        echo "Create generator processes per instance"
         echo "Usage.                        num_gen<int> interval<int> num_msg<int> var<int> verbose<bool> length<int>"
-        echo "Example. ./run.sh r-gen-data        4          500          5            50       true          10      "
-        echo "time in milliseconds; sock ip:port"
+        echo "Example. ./run.sh r-gen-data        2          500          5            50       true          10      "
+        echo "time in milliseconds; sock ip:port. "
         tput sgr0
         exit 1
     fi
+
+    experiment_name=$(cat experiment.txt)
     nodes=$(cat gen-instance.txt)
     gen_instances=""
     gen_ips=""
@@ -58,8 +61,12 @@ function remote_gen_data {
         local instanceId 
         local ip
         IFS=',' read -r instanceId ip  <<< "$node"
-        gen_instances="$instanceId"
+        gen_instances="$gen_instances $instanceId"
         gen_ips="$gen_ips $ip"
+
+        local_gen_out="./output/${experiment_name}/${instanceId}"
+        rm -rf ${local_gen_out}
+        mkdir -p ${local_gen_out}
     done
 
     nodes=$(cat eks-instance.txt)
@@ -69,21 +76,25 @@ function remote_gen_data {
         local instanceId 
         local ip
         IFS=',' read -r instanceId ip  <<< "$node"
-        eks_instances="$instanceId"
+        eks_instances="$eks_instances $instanceId"
         eks_ips="$eks_ips $ip"
     done
-    
-    ssh ${gen_instances} -- "rm -r /home/ubuntu/gen"
-    ssh ${gen_instances} -- "mkdir -p /home/ubuntu/gen"
-    ssh ${gen_instances} -- "/home/ubuntu/data-gen.sh ${eks_ips}:30009 $@"
+    pids="" 
+    for gen_instance in ${gen_instances}; do 
+        ssh ${gen_instance} -- "rm -r /home/ubuntu/gen"
+        ssh ${gen_instance} -- "mkdir -p /home/ubuntu/gen"
+        ssh ${gen_instance} "/home/ubuntu/data-gen.sh ${eks_ips}:30009 $@" &
+        pids="$pids $!"
+    done
+
+    for pid in $pids; do
+        wait $pid
+    done
 
     echo "Finish. All generators."
-    experiment_name=$(cat experiment.txt)
-    local_gen_out="./output/${experiment_name}/${gen_instances}"
-    echo ${local_gen_out}
-    rm -rf ${local_gen_out}
-    mkdir -p ${local_gen_out}
-    scp -r ${gen_instances}:/home/ubuntu/gen ${local_gen_out}
+    for gen_instance in ${gen_instances}; do 
+        scp -r ${gen_instance}:/home/ubuntu/gen ${local_gen_out}
+    done
 }
 
 function remote_clean_proc {
@@ -109,37 +120,44 @@ function quick_json_gen {
     curl --header "Content-Type: application/json" --request POST --data '{"text":"test test","mid":"1"}' http://$1/run
 }
 
-function add_gen_instance {
-    echo "Launch AWS Generator instance"
-    local instance=$(aws ec2 run-instances --launch-template LaunchTemplateId=${GENERATOR_LAUNCH_TEMPLATE} --query 'Instances[*].InstanceId' | jq -r '. | join(" ")')
-    echo "Generator id $instance"
-    details=$(aws ec2 describe-instances --instance-ids $instance --query "Reservations[*].Instances[*].{pubip:PublicIpAddress,id:InstanceId,privateip:PrivateIpAddress}[]")
-    sleep 8 # make sure instances is allocated
-    info=$(echo "$details" | jq -c '.[]')
-    echo $info > details
+function add_gen_instances {
+    num_instance=$1
+    instances=""
+    for i in {1..${num_instance}}; do
+        echo "Launch AWS Generator instance"
+        local instance=$(aws ec2 run-instances --launch-template LaunchTemplateId=${GENERATOR_LAUNCH_TEMPLATE} --query 'Instances[*].InstanceId' | jq -r '. | join(" ")')
+        echo "Generator id $instance"
+        instances="$instances $instance"
+    done
+    sleep 20 # make sure instances is allocated
+    for instance in $instances; do
+        details=$(aws ec2 describe-instances --instance-ids $instance --query "Reservations[*].Instances[*].{pubip:PublicIpAddress,id:InstanceId,privateip:PrivateIpAddress}[]")
+        info=$(echo "$details" | jq -c '.[]')
+        echo $info > details
+        local instanceId=$(echo $info | jq -r '.id')
+        local ip=$(echo $info | jq -r '.pubip')
+        mkdir -p ~/.ssh/config.d
+        echo "$instanceId,$ip" > gen-instance.txt
+        # setup up ssh
+        echo "Host $instanceId" >> ~/.ssh/config.d/serviceMesh
+        echo "    Hostname $ip" >> ~/.ssh/config.d/serviceMesh
+        echo "    User ubuntu" >> ~/.ssh/config.d/serviceMesh
+        echo "    IdentityFile ~/.ssh/bowen.pem" >> ~/.ssh/config.d/serviceMesh
+        echo "    StrictHostKeyChecking no" >> ~/.ssh/config.d/serviceMesh
+        echo "    UserKnownHostsFile=/dev/null" >> ~/.ssh/config.d/serviceMesh
+        echo "" >> ~/.ssh/config.d/serviceMesh
 
-    local instanceId=$(echo $info | jq -r '.id')
-    local ip=$(echo $info | jq -r '.pubip')
-    mkdir -p ~/.ssh/config.d
-    echo "$instanceId,$ip" > gen-instance.txt
-    # setup up ssh
-    echo "Host $instanceId" >> ~/.ssh/config.d/serviceMesh
-    echo "    Hostname $ip" >> ~/.ssh/config.d/serviceMesh
-    echo "    User ubuntu" >> ~/.ssh/config.d/serviceMesh
-    echo "    IdentityFile ~/.ssh/bowen.pem" >> ~/.ssh/config.d/serviceMesh
-    echo "    StrictHostKeyChecking no" >> ~/.ssh/config.d/serviceMesh
-    echo "    UserKnownHostsFile=/dev/null" >> ~/.ssh/config.d/serviceMesh
-    echo "" >> ~/.ssh/config.d/serviceMesh
-    tput setaf 2 
-    echo "Generator started"
-    tput sgr0
+        tput setaf 2 
+        echo "Generator started"
+        tput sgr0
 
-    scp -r ./data-gen $instanceId:/home/ubuntu
-    scp script/data-gen.sh $instanceId:/home/ubuntu
-    ssh $instanceId -- "chmod +x data-gen.sh"
-    tput setaf 2 
-    echo "data-gen transferred"
-    tput sgr0
+        scp -r ./data-gen $instanceId:/home/ubuntu
+        scp script/data-gen.sh $instanceId:/home/ubuntu
+        ssh $instanceId -- "chmod +x data-gen.sh"
+        tput setaf 2 
+        echo "data-gen transferred"
+        tput sgr0
+    done
 }
 
 function setup_gen_pkg {
@@ -375,10 +393,48 @@ function build_image {
     echo "For pushing image to docker hub"
 }
 
+function start_exp {
+    if [ "$#" -ne 10 ]; then
+        tput setaf 1 
+        echo "Usage. start generators and takes measurements to eks node"
+        echo "./run.sh start-exp freq<int> time<int> name<str> num_gen<int> interval<int> num_msg<int> var<int> verbose<bool> length<int>"
+        echo "Example: ./run.sh start-exp 99 30 test-exp 10 10 4000 2 false 10" 
+        echo "output is stored under name directory, including profile and gen info"
+        tput sgr0
+        exit 1
+    fi
+
+    freq=$1
+    period=$2
+    name=$3
+    pids=""
+    # generate data. MAKE SURE gen generate long enough to cover $period + 3 sec
+    mkdir -p "output/$name"
+    echo "$name" > experiment.txt
+
+    remote_gen_data ${@:4} "text" &
+    pids="$pids $!"
+    echo "Start generating http request. after 3 sec, start perf profile" 
+    sleep 3
+    # after 3 sec start exp
+    echo "Start perf for $period sec"
+    ssh_perf $freq $period $name
+    echo "Finish perf. Wait until generators stop, collecting data"
+    for pid in $pids; do
+        wait $pid
+    done
+    echo "Finish data collection from all generators. Start analyzing data"
+
+    # analyze the data 
+    ./script/read_measure.py output/${name} 'tokio-runtime-w'
+    echo 'Run ->'
+    echo "scp turing:/home/bowen/system-network/service-mesh-measurement/testbed/script/perf-analysis.png ."
+}
+
 function ssh_perf {
     if [ "$#" -ne 3 ]; then
         tput setaf 1 
-        echo "Usage. run perf on minikube on some time with sample freq"
+        echo "Usage. run perf on eks for some time with sample freq"
         echo "Example. ./run.sh ssh-perf freq time name"
         tput sgr0
         exit 1
@@ -404,13 +460,14 @@ function ssh_perf {
     command_str="sudo perf record -F $1 -a -g -o /home/ec2-user/perf.data -- sleep $2 "
     echo ${command_str} | ssh $instances &> /dev/null
     echo "sudo perf script --header -i perf.data > out.stacks" | ssh $instances &> /dev/null
-    echo "scp $instances:/home/ec2-user/out.stacks ./output/${name}.stacks"
     mkdir -p ./output/${name}
-    scp $instances:/home/ec2-user/out.stacks ./output/${name}.stacks
-    ./script/FlameGraph/stackcollapse-perf.pl < ./output/${name}.stacks | ./script/FlameGraph/flamegraph.pl --hash > output/${name}.svg
+    echo "scp $instances:/home/ec2-user/out.stacks ./output/${name}/out.stacks"
+
+    scp $instances:/home/ec2-user/out.stacks ./output/${name}/out.stacks
+    ./script/FlameGraph/stackcollapse-perf.pl < ./output/${name}/out.stacks | ./script/FlameGraph/flamegraph.pl --hash > output/${name}/out.svg
 
     echo "Run -> "
-    echo "scp turing:/home/bowen/system-network/service-mesh-measurement/testbed/output/${name}.svg ."
+    echo "scp turing:/home/bowen/system-network/service-mesh-measurement/testbed/output/${name}/out.svg ."
     echo "To fetch the plot"
 }
 
@@ -490,6 +547,7 @@ case "$1" in
 
     Measure service mesh
 
+      start-exp h              Start a measure experiment 
       ssh-perf fq t            Record CPU activity on AWS nodew
       mini-perf-record fq t    Record CPU activity on minikube
       mini-plot                Get flame graph for minikube perf
@@ -503,7 +561,7 @@ case "$1" in
       r-gen-data               Generate payload from AWS instances
       r-clean-proc             Clean payload generating process on AWS
 
-      add-gen-instance         Create AWS instance for sending request
+      add-gen-instances n      Create AWS instance for sending request
       setup-gen-pkg            Setup AWS generator necessary binary
       rm-gen-instance          Remove AWS generator instance
 
@@ -534,8 +592,8 @@ EOF
     remote_gen_data $2 $3 $4 $5 $6 $7 $8 "text" ;;
   r-clean-proc)
     remote_clean_proc ;;
-  add-gen-instance)
-    add_gen_instance ;;
+  add-gen-instances)
+    add_gen_instances $2 ;;
   setup-gen-pkg)
     setup_gen_pkg ;;
   rm-gen-instance)
@@ -552,6 +610,8 @@ EOF
     stop_service ;;
   build-image)
     build_image ;;
+  start-exp)
+    start_exp ${@:2} ;;
   ssh-perf)
     ssh_perf $2 $3 $4 ;;
   mini-perf-record)
