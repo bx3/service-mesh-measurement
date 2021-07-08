@@ -65,6 +65,8 @@ func RandStringBytes(n int) string {
 
 func send_text_data(sock string, numTrans int, interval int, variance int, verbose bool, length int, outpath string) {
     total_service_time := time.Duration(0)
+    start_unix_time := time.Now().UnixNano() / int64(time.Millisecond)
+
     for i := 0; i < numTrans; i++ {
         httpposturl := "http://" + sock + "/run"
         data := RandStringBytes(length)
@@ -100,8 +102,13 @@ func send_text_data(sock string, numTrans int, interval int, variance int, verbo
     }
     f, err := os.Create(outpath)
     check(err)
-    output := fmt.Sprintf("%s Finish %d in %d ns", outpath, numTrans, total_service_time.Nanoseconds())
+    output := fmt.Sprintf("%s Finish %d in %d ns\n", outpath, numTrans, total_service_time.Nanoseconds())
+    complete_unix_time := time.Now().UnixNano() / int64(time.Millisecond)
+    start_txt := fmt.Sprintf("%s Starts in Unix time %d ms\n", outpath, start_unix_time)
+    complete_txt := fmt.Sprintf("%s Ends in Unix time %d ms\n", outpath, complete_unix_time)
     f.WriteString(output)
+    f.WriteString(start_txt)
+    f.WriteString(complete_txt)
     fmt.Println(output)
 }
 

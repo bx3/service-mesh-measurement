@@ -26,14 +26,19 @@ verbose=$6
 length=$7
 goCommand=$8
 pids=""
-for i in $(seq 1 $num_gen); do
-    mkdir -p "/home/ubuntu/gen"
-    outpath="/home/ubuntu/gen/gen$i"
-    ./data-gen/data-gen $goCommand -sock=$sock -interval=${interval} -num=${num_msg} -var=$variance -verbose=$verbose -length=$length -outpath=$outpath &
-    pid="$!"
-    pids="$pids $pid"
-done
-for pid in $pids; do
-    wait $pid
-done
 
+# log includes: start.txt, pids.txt, proc{i}.txt
+# gen includes: gen{i}
+
+rm -rf "/home/ubuntu/gen"
+rm -rf "/home/ubuntu/log"
+mkdir -p "/home/ubuntu/gen"
+mkdir -p "/home/ubuntu/log"
+
+echo "Start at $(($(date +%s%N)/1000000)) ms" > "/home/ubuntu/log/start.txt"
+for i in $(seq 1 $num_gen); do
+    outpath="/home/ubuntu/gen/gen$i"
+    nohup ./data-gen/data-gen $goCommand -sock=$sock -interval=${interval} -num=${num_msg} -var=$variance -verbose=$verbose -length=$length -outpath=$outpath &> "/home/ubuntu/log/proc$i.txt" &
+    echo $! >> /home/ubuntu/log/pids.txt
+    echo "$outpath started at $(($(date +%s%N)/1000000)) ms" >> "/home/ubuntu/log/start.txt"
+done

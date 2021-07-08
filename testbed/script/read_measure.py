@@ -9,10 +9,11 @@ import numpy as np
 import matplotlib.patches as mpatches
 from matplotlib.font_manager import FontProperties
 
-if len(sys.argv) < 3:
+if len(sys.argv) < 4:
     print('Need gen directory file')
     print('Need target svg field name')
-    print('Example: ./read_measure.py output tokio-runtime-w')
+    print('If sort exp name <y/n>')
+    print('Example: ./read_measure.py output tokio-runtime-w y')
     sys.exit(1)
 
 def get_service_time(gen_file):
@@ -79,8 +80,9 @@ def read_exp(exp_path):  #iterate_instances
                 gen_dir = os.path.join(instance_dir, f)
                 service_times = []
                 for k in os.listdir(gen_dir):
-                    data = get_service_time(os.path.join(gen_dir, k))
-                    service_times.append(data)
+                    if 'gen' in k:
+                        data = get_service_time(os.path.join(gen_dir, k))
+                        service_times.append(data)
                 instances[instance_id]['service_time']= service_times
                 
             # ...  others ...
@@ -114,11 +116,13 @@ def sort_exp(names):
 
 data_dir = sys.argv[1]
 field = sys.argv[2]
+is_sort_name = sys.argv[3] == 'y'
 
 # extract data
 exps = {}
 exp_names = os.listdir(data_dir)
-exp_names = sort_exp(exp_names)
+if is_sort_name:
+    exp_names = sort_exp(exp_names)
 
 for exp_name in exp_names:
     if exp_name[0] == '.':
@@ -189,7 +193,7 @@ envoy_pat =  mpatches.Patch(color='blue', label='sum-envoy-worker')
 idle_pat =  mpatches.Patch(color='green', label='idle')
 ax[0].legend(handles=[tokio_pat, envoy_pat, idle_pat], title='cpu category', bbox_to_anchor=(1.05, 1), loc='upper left', prop=fontP)
 plt.tight_layout()
-plt.savefig('perf-analysis')
+plt.savefig(os.path.join(data_dir, 'perf-analysis'))
 
 
 
